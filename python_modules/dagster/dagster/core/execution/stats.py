@@ -88,6 +88,8 @@ def build_run_step_stats_from_events(
     run_id: str, records: Iterable[EventLogEntry]
 ) -> List["RunStepKeyStatsSnapshot"]:
     by_step_key: Dict[str, Dict[str, Any]] = defaultdict(dict)
+    attempts = defaultdict(list)
+    attempt_events = defaultdict(list)
     for event in records:
         if not event.is_dagster_event:
             continue
@@ -124,10 +126,55 @@ def build_run_step_stats_from_events(
             step_expectation_results.append(expectation_result)
             by_step_key[step_key]["expectation_results"] = step_expectation_results
 
+        if dagster_event.event_type in (
+            DagsterEventType.STEP_UP_FOR_RETRY,
+            DagsterEventType.STEP_RESTARTED,
+        ):
+            attempt_events[step_key].append(event)
+
+    for step_key, step_stats in by_step_key.items():
+        events = attempt_events[step_key]
+        step_attempts = []
+        attempt_start = step_stats.get("start_time")
+        for event in events:
+            event_time = event.timestamp if event.timestamp else None
+            if event.dagster_event.event_type == DagsterEventType.STEP_UP_FOR_RETRY:
+                step_attempts.append(
+                    RunStepAttemptStats(start_time=attempt_start, end_time=event_time)
+                )
+            elif event.dagster_event.event_type == DagsterEventType.STEP_RESTARTED:
+                attempt_start = event_time
+        if step_stats.get("end_time"):
+            step_attempts.append(
+                RunStepAttemptStats(start_time=attempt_start, end_time=step_stats["end_time"])
+            )
+        attempts[step_key] = step_attempts
+
     return [
-        RunStepKeyStatsSnapshot(run_id=run_id, step_key=step_key, **value)
+        RunStepKeyStatsSnapshot(
+            run_id=run_id, step_key=step_key, attempts_list=attempts[step_key], **value
+        )
         for step_key, value in by_step_key.items()
     ]
+
+
+@whitelist_for_serdes
+class RunStepAttemptStats(
+    namedtuple(
+        "_RunStepAttemptStats",
+        ("start_time end_time"),
+    )
+):
+    def __new__(
+        cls,
+        start_time=None,
+        end_time=None,
+    ):
+        return super(RunStepAttemptStats, cls).__new__(
+            cls,
+            start_time=check.opt_float_param(start_time, "start_time"),
+            end_time=check.opt_float_param(end_time, "end_time"),
+        )
 
 
 @whitelist_for_serdes
@@ -135,7 +182,8 @@ class RunStepKeyStatsSnapshot(
     namedtuple(
         "_RunStepKeyStatsSnapshot",
         (
-            "run_id step_key status start_time end_time materializations expectation_results attempts"
+            "run_id step_key status start_time end_time materializations expectation_results "
+            "attempts attempts_list"
         ),
     )
 ):
@@ -149,8 +197,8 @@ class RunStepKeyStatsSnapshot(
         materializations=None,
         expectation_results=None,
         attempts=None,
+        attempts_list=None,
     ):
-
         return super(RunStepKeyStatsSnapshot, cls).__new__(
             cls,
             run_id=check.str_param(run_id, "run_id"),
@@ -165,4 +213,5 @@ class RunStepKeyStatsSnapshot(
                 expectation_results, "expectation_results", ExpectationResult
             ),
             attempts=check.opt_int_param(attempts, "attempts"),
+            attempts_list=check.opt_list_param(attempts_list, "attempts_list", RunStepAttemptStats),
         )

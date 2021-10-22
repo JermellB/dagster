@@ -12,7 +12,11 @@ from dagster.core.definitions.events import AssetKey, AssetMaterialization
 from dagster.core.errors import DagsterEventLogInvalidForRun
 from dagster.core.events import DagsterEventType
 from dagster.core.events.log import EventLogEntry
-from dagster.core.execution.stats import RunStepKeyStatsSnapshot, StepEventStatus
+from dagster.core.execution.stats import (
+    RunStepKeyStatsSnapshot,
+    StepEventStatus,
+    RunStepAttemptStats,
+)
 from dagster.serdes import deserialize_json_to_dagster_namedtuple, serialize_dagster_namedtuple
 from dagster.serdes.errors import DeserializationError
 from dagster.utils import datetime_as_float, utc_datetime_from_naive, utc_datetime_from_timestamp
@@ -346,13 +350,15 @@ class SqlEventLogStorage(EventLogStorage):
                 by_step_key[step_key]["start_time"] = (
                     datetime_as_float(result.timestamp) if result.timestamp else None
                 )
-                by_step_key[step_key]["attempts"] = by_step_key[step_key].get("attempts", 0) + 1
+                by_step_key[step_key]["attempt_count"] = (
+                    by_step_key[step_key].get("attempt_count", 0) + 1
+                )
             if result.dagster_event_type == DagsterEventType.STEP_RESTARTED.value:
-                by_step_key[step_key]["attempts"] = (
+                by_step_key[step_key]["attempt_count"] = (
                     # In case we see step retarted events but not a step started event, we want to
                     # only count the restarted events, since the attempt count represents
                     # the number of times we have successfully started runnning the step
-                    by_step_key[step_key].get("attempts", 0)
+                    by_step_key[step_key].get("attempt_count", 0)
                     + result.n_events_of_type_for_step
                 )
             if result.dagster_event_type == DagsterEventType.STEP_FAILURE.value:
@@ -373,6 +379,8 @@ class SqlEventLogStorage(EventLogStorage):
 
         materializations = defaultdict(list)
         expectation_results = defaultdict(list)
+        attempt_events = defaultdict(list)
+        attempts = defaultdict(list)
         raw_event_query = (
             db.select([SqlEventLogStorageTable.c.event])
             .where(SqlEventLogStorageTable.c.run_id == run_id)
@@ -382,6 +390,8 @@ class SqlEventLogStorage(EventLogStorage):
                     [
                         DagsterEventType.ASSET_MATERIALIZATION.value,
                         DagsterEventType.STEP_EXPECTATION_RESULT.value,
+                        DagsterEventType.STEP_RESTARTED.value,
+                        DagsterEventType.STEP_UP_FOR_RETRY.value,
                     ]
                 )
             )
@@ -409,8 +419,31 @@ class SqlEventLogStorage(EventLogStorage):
                     expectation_results[event.step_key].append(
                         event.dagster_event.event_specific_data.expectation_result
                     )
+                elif event.dagster_event.event_type in (
+                    DagsterEventType.STEP_UP_FOR_RETRY,
+                    DagsterEventType.STEP_RESTARTED,
+                ):
+                    attempt_events[event.step_key].append(event)
         except (seven.JSONDecodeError, DeserializationError) as err:
             raise DagsterEventLogInvalidForRun(run_id=run_id) from err
+
+        for step_key, step_stats in by_step_key.items():
+            events = attempt_events[step_key]
+            step_attempts = []
+            attempt_start = step_stats.get("start_time")
+            for event in events:
+                event_time = datetime_as_float(event.timestamp) if event.timestamp else None
+                if event.dagster_event.event_type == DagsterEventType.STEP_UP_FOR_RETRY:
+                    step_attempts.append(
+                        RunStepAttemptStats(start_time=attempt_start, end_time=event_time)
+                    )
+                elif event.dagster_event.event_type == DagsterEventType.STEP_RESTARTED:
+                    attempt_start = event_time
+            if step_stats.get("end_time"):
+                step_attempts.append(
+                    RunStepAttemptStats(start_time=attempt_start, end_time=step_stats["end_time"])
+                )
+            attempts[step_key] = step_attempts
 
         return [
             RunStepKeyStatsSnapshot(
@@ -419,9 +452,10 @@ class SqlEventLogStorage(EventLogStorage):
                 status=value.get("status"),
                 start_time=value.get("start_time"),
                 end_time=value.get("end_time"),
-                materializations=materializations.get(step_key),
-                expectation_results=expectation_results.get(step_key),
+                materializations=materializations[step_key],
+                expectation_results=expectation_results[step_key],
                 attempts=value.get("attempts"),
+                attempts_list=attempts[step_key],
             )
             for step_key, value in by_step_key.items()
         ]

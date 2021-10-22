@@ -383,6 +383,7 @@ type RunStepStats implements PipelineRunStepStats {
   endTime: Float
   materializations: [Materialization!]!
   expectationResults: [ExpectationResult!]!
+  attempts: [RunStepAttempt!]!
 }
 
 interface PipelineRunStepStats {
@@ -428,6 +429,11 @@ type ExpectationResult implements DisplayableEvent {
   description: String
   metadataEntries: [EventMetadataEntry!]!
   success: Boolean!
+}
+
+type RunStepAttempt {
+  startTime: Float
+  endTime: Float
 }
 
 type ComputeLogs {
