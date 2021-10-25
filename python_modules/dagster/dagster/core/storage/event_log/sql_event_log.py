@@ -13,9 +13,9 @@ from dagster.core.errors import DagsterEventLogInvalidForRun
 from dagster.core.events import DagsterEventType
 from dagster.core.events.log import EventLogEntry
 from dagster.core.execution.stats import (
+    RunStepAttemptStats,
     RunStepKeyStatsSnapshot,
     StepEventStatus,
-    RunStepAttemptStats,
 )
 from dagster.serdes import deserialize_json_to_dagster_namedtuple, serialize_dagster_namedtuple
 from dagster.serdes.errors import DeserializationError
@@ -432,13 +432,13 @@ class SqlEventLogStorage(EventLogStorage):
             step_attempts = []
             attempt_start = step_stats.get("start_time")
             for event in events:
-                event_time = datetime_as_float(event.timestamp) if event.timestamp else None
+                print("RETRY EVENT", event)
                 if event.dagster_event.event_type == DagsterEventType.STEP_UP_FOR_RETRY:
                     step_attempts.append(
-                        RunStepAttemptStats(start_time=attempt_start, end_time=event_time)
+                        RunStepAttemptStats(start_time=attempt_start, end_time=event.timestamp)
                     )
                 elif event.dagster_event.event_type == DagsterEventType.STEP_RESTARTED:
-                    attempt_start = event_time
+                    attempt_start = event.timestamp
             if step_stats.get("end_time"):
                 step_attempts.append(
                     RunStepAttemptStats(start_time=attempt_start, end_time=step_stats["end_time"])
