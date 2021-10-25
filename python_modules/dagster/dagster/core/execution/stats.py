@@ -138,6 +138,8 @@ def build_run_step_stats_from_events(
         attempt_start = step_stats.get("start_time")
         for event in events:
             event_time = event.timestamp if event.timestamp else None
+            if not event.dagster_event:
+                continue
             if event.dagster_event.event_type == DagsterEventType.STEP_UP_FOR_RETRY:
                 step_attempts.append(
                     RunStepAttemptStats(start_time=attempt_start, end_time=event_time)
