@@ -432,7 +432,6 @@ class SqlEventLogStorage(EventLogStorage):
             step_attempts = []
             attempt_start = step_stats.get("start_time")
             for event in events:
-                print("RETRY EVENT", event)
                 if event.dagster_event.event_type == DagsterEventType.STEP_UP_FOR_RETRY:
                     step_attempts.append(
                         RunStepAttemptStats(start_time=attempt_start, end_time=event.timestamp)
@@ -454,7 +453,7 @@ class SqlEventLogStorage(EventLogStorage):
                 end_time=value.get("end_time"),
                 materializations=materializations[step_key],
                 expectation_results=expectation_results[step_key],
-                attempts=value.get("attempts"),
+                attempts=value.get("attempt_count"),
                 attempts_list=attempts[step_key],
             )
             for step_key, value in by_step_key.items()
