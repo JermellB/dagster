@@ -12,6 +12,7 @@ from dagster.core.storage.io_manager import IOManager, io_manager
 from dagster.core.storage.memoizable_io_manager import MemoizableIOManager
 from dagster.utils import PICKLE_PROTOCOL, mkdir_p
 from dagster.utils.backcompat import experimental
+import fickling
 
 
 @io_manager(config_schema={"base_dir": Field(StringSource, is_required=False)})
@@ -129,7 +130,7 @@ class PickledObjectFilesystemIOManager(MemoizableIOManager):
         context.log.debug(f"Loading file from: {filepath}")
 
         with open(filepath, self.read_mode) as read_obj:
-            return pickle.load(read_obj)
+            return fickling.load(read_obj)
 
 
 class CustomPathPickledObjectFilesystemIOManager(IOManager):
@@ -182,7 +183,7 @@ class CustomPathPickledObjectFilesystemIOManager(IOManager):
         context.log.debug(f"Loading file from: {filepath}")
 
         with open(filepath, self.read_mode) as read_obj:
-            return pickle.load(read_obj)
+            return fickling.load(read_obj)
 
 
 @io_manager(config_schema={"base_dir": Field(StringSource, is_required=True)})
