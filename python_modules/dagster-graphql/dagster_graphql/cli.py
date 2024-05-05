@@ -104,7 +104,7 @@ def execute_query_against_remote(host, query, variables):
             )
         )
 
-    sanity_check = requests.get(urljoin(host, "/dagit_info"))
+    sanity_check = requests.get(urljoin(host, "/dagit_info"), timeout=60)
     sanity_check.raise_for_status()
     if "dagit" not in sanity_check.text:
         raise click.UsageError(
@@ -114,7 +114,7 @@ def execute_query_against_remote(host, query, variables):
         urljoin(host, "/graphql"),
         # send query and vars as post body to avoid uri length limits
         json={"query": query, "variables": variables},
-    )
+    timeout=60)
     response.raise_for_status()
     str_res = response.json()
     return str_res

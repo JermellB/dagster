@@ -6,7 +6,7 @@ from dagster import ModeDefinition, fs_io_manager, pipeline, solid
 
 @solid
 def download_cereals():
-    response = requests.get("https://docs.dagster.io/assets/cereal.csv")
+    response = requests.get("https://docs.dagster.io/assets/cereal.csv", timeout=60)
     lines = response.text.split("\n")
     return [row for row in csv.DictReader(lines)]
 

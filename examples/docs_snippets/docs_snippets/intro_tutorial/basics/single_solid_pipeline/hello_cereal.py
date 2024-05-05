@@ -8,7 +8,7 @@ from dagster import job, op
 
 @op
 def hello_cereal(context):
-    response = requests.get("https://docs.dagster.io/assets/cereal.csv")
+    response = requests.get("https://docs.dagster.io/assets/cereal.csv", timeout=60)
     lines = response.text.split("\n")
     cereals = [row for row in csv.DictReader(lines)]
     context.log.info(f"Found {len(cereals)} cereals")

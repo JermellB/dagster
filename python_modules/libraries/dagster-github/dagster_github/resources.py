@@ -77,7 +77,7 @@ class GithubResource:
                 self.hostname, installation_id
             ),
             headers=headers,
-        )
+        timeout=60)
         request.raise_for_status()
         auth = request.json()
         self.installation_tokens[installation_id] = {
@@ -106,7 +106,7 @@ class GithubResource:
             else "https://{}/api/graphql".format(self.hostname),
             json={"query": query, "variables": variables},
             headers=headers,
-        )
+        timeout=60)
         request.raise_for_status()
         return request.json()
 
