@@ -1,7 +1,7 @@
 # pylint: disable=unused-argument
 
-import requests
 from dagster import DagsterType, In, Nothing, Out, op
+from security import safe_requests
 
 
 class MockResponse:
@@ -31,7 +31,7 @@ def my_op():
 @op(config_schema={"api_endpoint": str})
 def my_configurable_op(context):
     api_endpoint = context.op_config["api_endpoint"]
-    data = requests.get(f"{api_endpoint}/data").json()
+    data = safe_requests.get(f"{api_endpoint}/data").json()
     return data
 
 

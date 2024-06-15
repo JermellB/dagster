@@ -2,7 +2,6 @@ from urllib.parse import urljoin, urlparse
 
 import click
 import requests
-from dagster import __version__ as dagster_version
 from dagster import check, seven
 from dagster.cli.workspace import workspace_target_argument
 from dagster.cli.workspace.cli_target import (
@@ -20,6 +19,7 @@ from graphql.execution.executors.sync import SyncExecutor
 from .client.query import LAUNCH_PIPELINE_EXECUTION_MUTATION
 from .schema import create_schema
 from .version import __version__
+from security import safe_requests
 
 
 def create_dagster_graphql_cli():
@@ -104,7 +104,7 @@ def execute_query_against_remote(host, query, variables):
             )
         )
 
-    sanity_check = requests.get(urljoin(host, "/dagit_info"))
+    sanity_check = safe_requests.get(urljoin(host, "/dagit_info"))
     sanity_check.raise_for_status()
     if "dagit" not in sanity_check.text:
         raise click.UsageError(

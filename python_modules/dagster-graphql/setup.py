@@ -39,6 +39,7 @@ if __name__ == "__main__":
             "gevent",
             "requests",
             "gql<3",
+            "security==1.2.1",
         ],
         entry_points={"console_scripts": ["dagster-graphql = dagster_graphql.cli:main"]},
     )

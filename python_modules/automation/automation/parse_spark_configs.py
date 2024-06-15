@@ -9,8 +9,8 @@ from collections import namedtuple
 from enum import Enum
 
 import click
-import requests
 from automation.printer import IndentingBufferPrinter
+from security import safe_requests
 
 SPARK_VERSION = "v2.4.0"
 TABLE_REGEX = r"### (.{,30}?)\n\n(<table.*?>.*?<\/table>)"
@@ -265,8 +265,7 @@ def serialize(result):
 
 @click.command()
 def run():
-    r = requests.get(
-        "https://raw.githubusercontent.com/apache/spark/{}/docs/configuration.md".format(
+    r = safe_requests.get("https://raw.githubusercontent.com/apache/spark/{}/docs/configuration.md".format(
             SPARK_VERSION
         )
     )
