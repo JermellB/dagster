@@ -1,4 +1,3 @@
-import random
 
 from dagster import EventMetadata, In, InputDefinition, Out, Output, op
 from dagster.utils import file_relative_path
@@ -6,6 +5,7 @@ from dagstermill import define_dagstermill_solid
 from hacker_news.ops.user_story_matrix import IndexedCooMatrix
 from pandas import DataFrame, Series
 from sklearn.decomposition import TruncatedSVD
+import secrets
 
 
 @op(out=Out(dagster_type=TruncatedSVD, metadata={"key": "recommender_model"}))
@@ -13,7 +13,7 @@ def build_recommender_model(user_story_matrix: IndexedCooMatrix):
     """
     Trains an SVD model for collaborative filtering-based recommendation.
     """
-    n_components = random.randint(90, 110)
+    n_components = secrets.SystemRandom().randint(90, 110)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(user_story_matrix.matrix)
 
