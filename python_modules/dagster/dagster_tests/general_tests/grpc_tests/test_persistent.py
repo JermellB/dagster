@@ -17,6 +17,7 @@ from dagster.serdes import deserialize_json_to_dagster_namedtuple
 from dagster.seven import get_system_temp_directory
 from dagster.utils import file_relative_path, find_free_port
 from dagster.utils.error import SerializableErrorInfo
+from security import safe_command
 
 
 def _get_ipc_output_file():
@@ -39,7 +40,7 @@ def test_ping():
         python_file,
     ]
 
-    process = subprocess.Popen(subprocess_args, stdout=subprocess.PIPE)
+    process = safe_command.run(subprocess.Popen, subprocess_args, stdout=subprocess.PIPE)
 
     try:
         wait_for_grpc_server(
@@ -65,8 +66,7 @@ def test_load_via_env_var():
     with environ(
         {"DAGSTER_CLI_API_GRPC_HOST": "localhost", "DAGSTER_CLI_API_GRPC_PORT": str(port)}
     ):
-        process = subprocess.Popen(
-            subprocess_args,
+        process = safe_command.run(subprocess.Popen, subprocess_args,
             stdout=subprocess.PIPE,
         )
 
@@ -95,8 +95,7 @@ def test_load_with_invalid_param(capfd):
         "bar_value",
     ]
 
-    process = subprocess.Popen(
-        subprocess_args,
+    process = safe_command.run(subprocess.Popen, subprocess_args,
         stdout=subprocess.PIPE,
     )
 
@@ -130,8 +129,7 @@ def test_load_with_error(capfd):
         python_file,
     ]
 
-    process = subprocess.Popen(
-        subprocess_args,
+    process = safe_command.run(subprocess.Popen, subprocess_args,
         stdout=subprocess.PIPE,
     )
 
@@ -183,8 +181,7 @@ def test_load_with_empty_working_directory(capfd):
     ]
 
     with new_cwd(os.path.dirname(__file__)):
-        process = subprocess.Popen(
-            subprocess_args,
+        process = safe_command.run(subprocess.Popen, subprocess_args,
             stdout=subprocess.PIPE,
         )
 
@@ -210,8 +207,7 @@ def test_load_with_empty_working_directory(capfd):
             "--empty-working-directory",
         ]
 
-        process = subprocess.Popen(
-            subprocess_args,
+        process = safe_command.run(subprocess.Popen, subprocess_args,
             stdout=subprocess.PIPE,
         )
         try:
@@ -244,8 +240,7 @@ def test_crash_during_load():
         python_file,
     ]
 
-    process = subprocess.Popen(
-        subprocess_args,
+    process = safe_command.run(subprocess.Popen, subprocess_args,
         stdout=subprocess.PIPE,
     )
     try:
@@ -278,7 +273,7 @@ def test_load_timeout():
         python_file,
     ]
 
-    process = subprocess.Popen(subprocess_args, stdout=subprocess.PIPE)
+    process = safe_command.run(subprocess.Popen, subprocess_args, stdout=subprocess.PIPE)
 
     timeout_exception = None
 
@@ -317,7 +312,7 @@ def test_lazy_load_with_error():
         "--lazy-load-user-code",
     ]
 
-    process = subprocess.Popen(subprocess_args, stdout=subprocess.PIPE)
+    process = safe_command.run(subprocess.Popen, subprocess_args, stdout=subprocess.PIPE)
 
     try:
         wait_for_grpc_server(
@@ -347,8 +342,7 @@ def test_lazy_load_via_env_var():
             python_file,
         ]
 
-        process = subprocess.Popen(
-            subprocess_args,
+        process = safe_command.run(subprocess.Popen, subprocess_args,
             stdout=subprocess.PIPE,
         )
 
@@ -379,8 +373,7 @@ def test_streaming():
         python_file,
     ]
 
-    process = subprocess.Popen(
-        subprocess_args,
+    process = safe_command.run(subprocess.Popen, subprocess_args,
         stdout=subprocess.PIPE,
     )
 
@@ -412,8 +405,7 @@ def test_sensor_timeout():
         python_file,
     ]
 
-    process = subprocess.Popen(
-        subprocess_args,
+    process = safe_command.run(subprocess.Popen, subprocess_args,
         stdout=subprocess.PIPE,
     )
 

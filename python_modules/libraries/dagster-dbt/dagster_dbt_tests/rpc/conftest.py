@@ -8,6 +8,7 @@ from urllib.error import URLError
 import pytest
 import responses
 from dagster_dbt import DbtRpcClient
+from security import safe_command
 
 TEST_HOSTNAME = "127.0.0.1"
 TEST_PORT = 8580
@@ -45,8 +46,7 @@ atexit.register(kill_all_subprocs)
 def dbt_rpc_server(
     dbt_seed, dbt_executable, dbt_config_dir
 ):  # pylint: disable=unused-argument, redefined-outer-name
-    proc = subprocess.Popen(
-        [
+    proc = safe_command.run(subprocess.Popen, [
             dbt_executable,
             "rpc",
             "--host",
