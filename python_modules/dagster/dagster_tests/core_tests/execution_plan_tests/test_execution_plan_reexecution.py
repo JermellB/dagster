@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import pytest
 from dagster import (
@@ -24,6 +23,7 @@ from dagster.core.execution.plan.plan import ExecutionPlan
 from dagster.core.instance import DagsterInstance
 from dagster.core.system_config.objects import ResolvedRunConfig
 from dagster.core.test_utils import default_mode_def_for_test
+import fickling
 
 
 def define_addy_pipeline(using_file_system=False):
@@ -67,13 +67,13 @@ def test_execution_plan_reexecution():
         os.path.join(instance.storage_directory(), result.run_id, "add_one", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 4
+        assert fickling.load(read_obj) == 4
 
     with open(
         os.path.join(instance.storage_directory(), result.run_id, "add_two", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 6
+        assert fickling.load(read_obj) == 6
 
     ## re-execute add_two
 
@@ -109,7 +109,7 @@ def test_execution_plan_reexecution():
         os.path.join(instance.storage_directory(), pipeline_run.run_id, "add_two", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 6
+        assert fickling.load(read_obj) == 6
 
     assert not get_step_output_event(step_events, "add_one")
     assert get_step_output_event(step_events, "add_two")
@@ -191,13 +191,13 @@ def test_pipeline_step_key_subset_execution():
         os.path.join(instance.storage_directory(), result.run_id, "add_one", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 4
+        assert fickling.load(read_obj) == 4
 
     with open(
         os.path.join(instance.storage_directory(), result.run_id, "add_two", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 6
+        assert fickling.load(read_obj) == 6
 
     ## re-execute add_two
 
@@ -224,7 +224,7 @@ def test_pipeline_step_key_subset_execution():
         ),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 6
+        assert fickling.load(read_obj) == 6
 
     assert not get_step_output_event(step_events, "add_one")
     assert get_step_output_event(step_events, "add_two")

@@ -85,6 +85,7 @@ if __name__ == "__main__":
             # https://github.com/mhammond/pywin32/issues/1439
             'pywin32 != 226; platform_system=="Windows"',
             "docstring-parser",
+            "fickling>=0.1.3,~=0.1.0",
         ],
         extras_require={
             "docker": ["docker"],

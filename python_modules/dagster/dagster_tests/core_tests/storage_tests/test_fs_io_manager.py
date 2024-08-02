@@ -1,5 +1,4 @@
 import os
-import pickle
 import tempfile
 
 from dagster import ModeDefinition, execute_pipeline, graph, op, pipeline, solid
@@ -8,6 +7,7 @@ from dagster.core.execution.api import create_execution_plan
 from dagster.core.instance import DagsterInstance
 from dagster.core.storage.fs_io_manager import fs_io_manager
 from dagster.core.test_utils import instance_for_test
+import fickling
 
 
 def define_pipeline(io_manager):
@@ -40,7 +40,7 @@ def test_fs_io_manager():
         filepath_a = os.path.join(tmpdir_path, result.run_id, "solid_a", "result")
         assert os.path.isfile(filepath_a)
         with open(filepath_a, "rb") as read_obj:
-            assert pickle.load(read_obj) == [1, 2, 3]
+            assert fickling.load(read_obj) == [1, 2, 3]
 
         loaded_input_events = list(filter(lambda evt: evt.is_loaded_input, result.event_list))
         assert len(loaded_input_events) == 1
@@ -49,7 +49,7 @@ def test_fs_io_manager():
         filepath_b = os.path.join(tmpdir_path, result.run_id, "solid_b", "result")
         assert os.path.isfile(filepath_b)
         with open(filepath_b, "rb") as read_obj:
-            assert pickle.load(read_obj) == 1
+            assert fickling.load(read_obj) == 1
 
 
 def test_fs_io_manager_base_dir():
@@ -65,7 +65,7 @@ def test_fs_io_manager_base_dir():
         with open(
             os.path.join(instance.storage_directory(), result.run_id, "solid_a", "result"), "rb"
         ) as read_obj:
-            assert pickle.load(read_obj) == [1, 2, 3]
+            assert fickling.load(read_obj) == [1, 2, 3]
 
 
 def test_fs_io_manager_memoization():
