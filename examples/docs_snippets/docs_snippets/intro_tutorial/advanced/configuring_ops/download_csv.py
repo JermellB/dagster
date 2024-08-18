@@ -7,7 +7,7 @@ from dagster import op
 # start_download_cereals_marker
 @op
 def download_cereals():
-    response = requests.get("https://docs.dagster.io/assets/cereal.csv")
+    response = requests.get("https://docs.dagster.io/assets/cereal.csv", timeout=60)
     lines = response.text.split("\n")
     return [row for row in csv.DictReader(lines)]
 
@@ -18,7 +18,7 @@ def download_cereals():
 # start_download_csv_marker
 @op
 def download_csv(context):
-    response = requests.get(context.op_config["url"])
+    response = requests.get(context.op_config["url"], timeout=60)
     lines = response.text.split("\n")
     return [row for row in csv.DictReader(lines)]
 

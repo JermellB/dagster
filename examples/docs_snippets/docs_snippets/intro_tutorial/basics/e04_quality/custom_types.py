@@ -24,7 +24,7 @@ SimpleDataFrame = DagsterType(
 
 @op(out=Out(SimpleDataFrame))
 def download_csv(context):
-    response = requests.get("https://docs.dagster.io/assets/cereal.csv")
+    response = requests.get("https://docs.dagster.io/assets/cereal.csv", timeout=60)
     lines = response.text.split("\n")
     context.log.info("Read {n_lines} lines".format(n_lines=len(lines)))
     return [row for row in csv.DictReader(lines)]
