@@ -2,10 +2,9 @@ import gzip
 import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
-
-import requests
 from dagster import resource
 from dagster.utils import file_relative_path
+from security import safe_requests
 
 HNItemRecord = Dict[str, Any]
 
@@ -30,11 +29,11 @@ class HNAPIClient(HNClient):
     def fetch_item_by_id(self, item_id: int) -> Optional[HNItemRecord]:
 
         item_url = f"{HN_BASE_URL}/item/{item_id}.json"
-        item = requests.get(item_url, timeout=5).json()
+        item = safe_requests.get(item_url, timeout=5).json()
         return item
 
     def fetch_max_item_id(self) -> int:
-        return requests.get(f"{HN_BASE_URL}/maxitem.json", timeout=5).json()
+        return safe_requests.get(f"{HN_BASE_URL}/maxitem.json", timeout=5).json()
 
     def min_item_id(self) -> int:
         return 1
@@ -71,12 +70,12 @@ class HNAPISubsampleClient(HNClient):
         subsample_id = item_id - item_id % self.subsample_rate
         if subsample_id not in self._items:
             item_url = f"{HN_BASE_URL}/item/{subsample_id}.json"
-            item = requests.get(item_url, timeout=5).json()
+            item = safe_requests.get(item_url, timeout=5).json()
             self._items[subsample_id] = item
         return self._items[subsample_id]
 
     def fetch_max_item_id(self) -> int:
-        return requests.get(f"{HN_BASE_URL}/maxitem.json", timeout=5).json()
+        return safe_requests.get(f"{HN_BASE_URL}/maxitem.json", timeout=5).json()
 
     def min_item_id(self) -> int:
         return 1
