@@ -1,5 +1,4 @@
 import os
-import random
 import string
 import sys
 import tempfile
@@ -50,6 +49,7 @@ from dagster.daemon.controller import (
 from dagster.daemon.daemon import DAEMON_HEARTBEAT_ERROR_LIMIT, SensorDaemon
 from dagster.daemon.sensor import execute_sensor_iteration, execute_sensor_iteration_loop
 from dagster.seven.compat.pendulum import create_pendulum_time, to_timezone
+import secrets
 
 
 @solid
@@ -184,7 +184,7 @@ def run_cursor_sensor(context):
 
 
 def _random_string(length):
-    return "".join(random.choice(string.ascii_lowercase) for x in range(length))
+    return "".join(secrets.choice(string.ascii_lowercase) for x in range(length))
 
 
 @sensor(pipeline_name="config_pipeline")

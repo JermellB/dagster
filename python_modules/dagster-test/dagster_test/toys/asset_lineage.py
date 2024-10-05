@@ -1,6 +1,5 @@
 import datetime
 import os
-import random
 import string
 import warnings
 
@@ -22,6 +21,7 @@ from dagster import (
 )
 from dagster.core.storage.fs_io_manager import PickledObjectFilesystemIOManager
 from dagster.core.storage.io_manager import io_manager
+import secrets
 
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
@@ -106,18 +106,18 @@ def my_db_io_manager(_):
     ],
 )
 def download_data(_):
-    n_entries = random.randint(100, 1000)
+    n_entries = secrets.SystemRandom().randint(100, 1000)
 
     def user_id():
-        return "".join(random.choices(string.ascii_uppercase, k=10))
+        return "".join(secrets.SystemRandom().choices(string.ascii_uppercase, k=10))
 
     # generate some random data
     data = {
         "user_id": [user_id() for i in range(n_entries)],
         "action_type": [
-            random.choices(["story", "comment"], [0.15, 0.85])[0] for i in range(n_entries)
+            secrets.SystemRandom().choices(["story", "comment"], [0.15, 0.85])[0] for i in range(n_entries)
         ],
-        "score": [random.randint(0, 10000) for i in range(n_entries)],
+        "score": [secrets.SystemRandom().randint(0, 10000) for i in range(n_entries)],
     }
     df = pd.DataFrame.from_dict(data)
     yield Output(df, metadata=metadata_for_actions(df))
