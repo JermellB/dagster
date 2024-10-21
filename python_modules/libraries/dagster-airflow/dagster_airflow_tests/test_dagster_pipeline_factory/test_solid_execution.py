@@ -14,6 +14,7 @@ from dagster.core.storage.compute_log_manager import ComputeIOType
 from dagster.core.test_utils import instance_for_test
 from dagster.seven import get_current_datetime_in_utc
 from dagster_airflow.dagster_pipeline_factory import make_dagster_pipeline_from_airflow_dag
+from security import safe_command
 
 default_args = {
     "owner": "dagster",
@@ -236,7 +237,7 @@ def intercept_spark_submit(*args, **kwargs):
         m.wait.return_value = 0
         return m
     else:
-        return subprocess.Popen(*args, **kwargs)
+        return safe_command.run(subprocess.Popen, *args, **kwargs)
 
 
 @mock.patch("subprocess.Popen", side_effect=intercept_spark_submit)

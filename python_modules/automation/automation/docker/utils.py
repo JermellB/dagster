@@ -4,6 +4,7 @@ import sys
 from datetime import datetime, timezone
 
 from dagster import check
+from security import safe_command
 
 
 def execute_docker_build(image, docker_args=None, cwd=None):
@@ -21,7 +22,7 @@ def execute_docker_build(image, docker_args=None, cwd=None):
 
     print(" ".join(args))
 
-    retval = subprocess.call(args, stderr=sys.stderr, stdout=sys.stdout, cwd=cwd)
+    retval = safe_command.run(subprocess.call, args, stderr=sys.stderr, stdout=sys.stdout, cwd=cwd)
     check.invariant(retval == 0, "Process must exit successfully")
 
 

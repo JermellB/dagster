@@ -13,6 +13,7 @@ from dagster.utils import git_repository_root
 from dagster_k8s.utils import wait_for_pod
 
 from .integration_utils import IS_BUILDKITE, check_output, get_test_namespace, image_pull_policy
+from security import safe_command
 
 TEST_AWS_CONFIGMAP_NAME = "test-aws-env-configmap"
 TEST_CONFIGMAP_NAME = "test-env-configmap"
@@ -314,8 +315,7 @@ def _helm_chart_helper(
 
         print("Running Helm Install: \n", " ".join(helm_cmd), "\nWith config:\n", helm_config_yaml)
 
-        p = subprocess.Popen(
-            helm_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        p = safe_command.run(subprocess.Popen, helm_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         stdout, stderr = p.communicate(helm_config_yaml.encode("utf-8"))
         print("Helm install completed with stdout: ", stdout.decode("utf-8"))

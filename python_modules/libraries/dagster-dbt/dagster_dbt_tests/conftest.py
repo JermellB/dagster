@@ -5,6 +5,7 @@ from distutils import spawn
 import pytest
 from dagster.utils import file_relative_path, pushd
 from dagster.utils.test.postgres_instance import TestPostgresInstance
+from security import safe_command
 
 # ======= CONFIG ========
 DBT_EXECUTABLE = "dbt"
@@ -71,4 +72,4 @@ def prepare_dbt_cli(conn_string):  # pylint: disable=unused-argument, redefined-
 def dbt_seed(
     prepare_dbt_cli, dbt_executable, dbt_config_dir
 ):  # pylint: disable=unused-argument, redefined-outer-name
-    subprocess.run([dbt_executable, "seed", "--profiles-dir", dbt_config_dir], check=True)
+    safe_command.run(subprocess.run, [dbt_executable, "seed", "--profiles-dir", dbt_config_dir], check=True)

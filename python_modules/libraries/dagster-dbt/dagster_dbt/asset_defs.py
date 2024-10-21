@@ -6,6 +6,7 @@ from typing import Any, Callable, List, Mapping, Optional
 
 from dagster import OpDefinition, Output, SolidExecutionContext, check
 from dagster.core.asset_defs import AssetIn, asset
+from security import safe_command
 
 
 def _load_manifest_for_project(
@@ -25,7 +26,7 @@ def _load_manifest_for_project(
     ]
     # running "dbt ls" regenerates the manifest.json, which includes a superset of the actual
     # "dbt ls" output
-    subprocess.Popen(command_list, stdout=subprocess.PIPE).wait()
+    safe_command.run(subprocess.Popen, command_list, stdout=subprocess.PIPE).wait()
     manifest_path = os.path.join(target_dir, "manifest.json")
     with open(manifest_path, "r") as f:
         return json.load(f)

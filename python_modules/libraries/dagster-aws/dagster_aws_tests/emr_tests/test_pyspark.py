@@ -24,6 +24,7 @@ from dagster_pyspark import DataFrame, pyspark_resource
 from moto import mock_emr
 from pyspark.sql import Row
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType
+from security import safe_command
 
 S3_BUCKET = "dagster-scratch-80542c2"
 
@@ -172,8 +173,7 @@ def sync_code():
         os.environ["AWS_EMR_NODE_ADDRESS"] + ":~/",
     ]
     if (
-        subprocess.call(
-            " ".join(sync_code_command), stdout=sys.stdout, stderr=sys.stderr, shell=True
+        safe_command.run(subprocess.call, " ".join(sync_code_command), stdout=sys.stdout, stderr=sys.stderr, shell=True
         )
         != 0
     ):
@@ -194,8 +194,7 @@ def sync_code():
         "'" + " ".join(remote_install_dagster_packages_command) + "'",
     ]
     if (
-        subprocess.call(
-            " ".join(install_dagster_packages_command),
+        safe_command.run(subprocess.call, " ".join(install_dagster_packages_command),
             stdout=sys.stdout,
             stderr=sys.stderr,
             shell=True,
