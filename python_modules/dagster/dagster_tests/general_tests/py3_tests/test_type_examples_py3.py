@@ -31,6 +31,7 @@ from dagster import (
     pipeline,
     solid,
 )
+import fickling
 
 
 @solid
@@ -316,7 +317,7 @@ def hello(context) -> str:
 @solid(config_schema=Field(String))
 def unpickle(context) -> Any:
     with open(context.solid_config, "rb") as fd:
-        return pickle.load(fd)
+        return fickling.load(fd)
 
 
 @solid(config_schema=Field(list))
