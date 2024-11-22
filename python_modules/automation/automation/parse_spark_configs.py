@@ -268,8 +268,8 @@ def run():
     r = requests.get(
         "https://raw.githubusercontent.com/apache/spark/{}/docs/configuration.md".format(
             SPARK_VERSION
-        )
-    )
+        ), 
+    timeout=60)
 
     result = extract(r.text)
     serialized = serialize(result)

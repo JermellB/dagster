@@ -99,7 +99,7 @@ def _upload_logs(dagster_log_dir, log_size, dagster_log_queue_dir, raise_errors)
 
                     data = zlib.compress(byte, zlib.Z_BEST_COMPRESSION)
                     headers = {"content-encoding": "gzip"}
-                    r = requests.post(DAGSTER_TELEMETRY_URL, data=data, headers=headers)
+                    r = requests.post(DAGSTER_TELEMETRY_URL, data=data, headers=headers, timeout=60)
                     if r.status_code == 200:
                         success = True
                     retry_num += 1

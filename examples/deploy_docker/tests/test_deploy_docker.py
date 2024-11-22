@@ -134,8 +134,8 @@ def test_deploy_docker():
 
             try:
                 sanity_check = requests.get(
-                    "http://{dagit_host}:3000/dagit_info".format(dagit_host=dagit_host)
-                )
+                    "http://{dagit_host}:3000/dagit_info".format(dagit_host=dagit_host), 
+                timeout=60)
                 assert "dagit" in sanity_check.text
                 break
             except requests.exceptions.ConnectionError:
@@ -147,8 +147,8 @@ def test_deploy_docker():
             "http://{dagit_host}:3000/graphql?query={query_string}".format(
                 dagit_host=dagit_host,
                 query_string=PIPELINES_OR_ERROR_QUERY,
-            )
-        ).json()
+            ), 
+        timeout=60).json()
 
         data = res.get("data")
         assert data
@@ -178,8 +178,8 @@ def test_deploy_docker():
                 dagit_host=dagit_host,
                 query_string=LAUNCH_PIPELINE_MUTATION,
                 variables=json.dumps(variables),
-            )
-        ).json()
+            ), 
+        timeout=60).json()
 
         assert launch_res["data"]["launchPipelineExecution"]["__typename"] == "LaunchRunSuccess"
 
@@ -206,8 +206,8 @@ def test_deploy_docker():
                 dagit_host=dagit_host,
                 query_string=LAUNCH_PIPELINE_MUTATION,
                 variables=json.dumps(variables),
-            )
-        ).json()
+            ), 
+        timeout=60).json()
 
         assert launch_res["data"]["launchPipelineExecution"]["__typename"] == "LaunchRunSuccess"
 
@@ -221,8 +221,8 @@ def test_deploy_docker():
                 dagit_host=dagit_host,
                 query_string=TERMINATE_MUTATION,
                 variables=json.dumps({"runId": hanging_run_id}),
-            )
-        ).json()
+            ), 
+        timeout=60).json()
 
         assert (
             terminate_res["data"]["terminatePipelineExecution"]["__typename"]
@@ -245,8 +245,8 @@ def _wait_for_run_status(run_id, dagit_host, desired_status):
                 dagit_host=dagit_host,
                 query_string=RUN_QUERY,
                 variables=json.dumps({"runId": run_id}),
-            )
-        ).json()
+            ), 
+        timeout=60).json()
 
         status = run_res["data"]["pipelineRunOrError"]["status"]
         assert status and status != "FAILED"
