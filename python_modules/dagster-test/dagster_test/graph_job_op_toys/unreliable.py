@@ -1,6 +1,6 @@
-from random import random
 
 from dagster import Field, graph, op
+import secrets
 
 DEFAULT_EXCEPTION_RATE = 0.3
 
@@ -12,7 +12,7 @@ def unreliable_start():
 
 @op(config_schema={"rate": Field(float, is_required=False, default_value=DEFAULT_EXCEPTION_RATE)})
 def unreliable_op(context, num):
-    if random() < context.op_config["rate"]:
+    if secrets.SystemRandom().random() < context.op_config["rate"]:
         raise Exception("blah")
 
     return num

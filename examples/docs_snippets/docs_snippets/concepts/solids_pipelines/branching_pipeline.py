@@ -1,14 +1,14 @@
 # pylint: disable=unused-argument, no-value-for-parameter
 
 # start_marker
-import random
 
 from dagster import Out, Output, job, op
+import secrets
 
 
 @op(out={"branch_1": Out(is_required=False), "branch_2": Out(is_required=False)})
 def branching_op():
-    num = random.randint(0, 1)
+    num = secrets.SystemRandom().randint(0, 1)
     if num == 0:
         yield Output(1, "branch_1")
     else:

@@ -8,6 +8,7 @@ from dagster import lambda_solid, pipeline, repository
 from dagster.core.host_representation.repository_location import GrpcServerRepositoryLocation
 from dagster.core.test_utils import instance_for_test
 from dagster_graphql.test.utils import define_out_of_process_workspace, main_repo_location_name
+import secrets
 
 
 def get_repo():
@@ -22,11 +23,9 @@ def get_repo():
     @pipeline
     def pipe():
         solid_A()
-
-    import random
     import string
 
-    @repository(name="".join(random.choice(string.ascii_lowercase) for i in range(10)))
+    @repository(name="".join(secrets.choice(string.ascii_lowercase) for i in range(10)))
     def my_repo():
         return [pipe]
 

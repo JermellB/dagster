@@ -1,6 +1,6 @@
-from random import random
 
 from dagster import graph, op
+import secrets
 
 
 @op
@@ -11,7 +11,7 @@ def start():
 @op
 def unreliable(num: int) -> int:
     failure_rate = 0.5
-    if random() < failure_rate:
+    if secrets.SystemRandom().random() < failure_rate:
         raise Exception("blah")
 
     return num
