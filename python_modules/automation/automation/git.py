@@ -3,6 +3,7 @@ import re
 import subprocess
 
 from .utils import check_output
+from security import safe_command
 
 
 def git_check_status():
@@ -154,4 +155,4 @@ def git_commit_updates(repo_dir, message):
         "Committing to {} with message {}".format(repo_dir, message)
     )
     for cmd in cmds:
-        subprocess.call(cmd, cwd=repo_dir, shell=True)
+        safe_command.run(subprocess.call, cmd, cwd=repo_dir, shell=True)

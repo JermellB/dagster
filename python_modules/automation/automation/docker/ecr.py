@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from dagster import check
+from security import safe_command
 
 # We default to using the ECR region here
 DEFAULT_AWS_ECR_REGION = "us-west-2"
@@ -41,7 +42,7 @@ def ensure_ecr_login(aws_region=DEFAULT_AWS_ECR_REGION):
     cmd = "aws ecr get-login --no-include-email --region {} | sh".format(aws_region)
 
     check.invariant(
-        subprocess.call(cmd, shell=True) == 0,
+        safe_command.run(subprocess.call, cmd, shell=True) == 0,
         "ECR login must succeed",
     )
 

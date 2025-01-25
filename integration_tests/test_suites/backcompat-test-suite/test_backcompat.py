@@ -9,6 +9,7 @@ import requests
 from dagster import file_relative_path
 from dagster.core.storage.pipeline_run import PipelineRunStatus
 from dagster_graphql import DagsterGraphQLClient
+from security import safe_command
 
 DAGSTER_CURRENT_BRANCH = "current_branch"
 MAX_TIMEOUT_SECONDS = 20
@@ -82,8 +83,7 @@ def docker_service_up(docker_compose_file, build_args=None):
     except subprocess.CalledProcessError:
         pass
 
-    build_process = subprocess.Popen(
-        [file_relative_path(docker_compose_file, "./build.sh")] + (build_args if build_args else [])
+    build_process = safe_command.run(subprocess.Popen, [file_relative_path(docker_compose_file, "./build.sh")] + (build_args if build_args else [])
     )
     build_process.wait()
     assert build_process.returncode == 0

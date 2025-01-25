@@ -14,6 +14,7 @@ from dagster.serdes import (
     whitelist_for_serdes,
 )
 from dagster.utils.error import SerializableErrorInfo, serializable_error_info_from_exc_info
+from security import safe_command
 
 
 def write_unary_input(input_file, obj):
@@ -189,7 +190,7 @@ def open_ipc_subprocess(parts, **kwargs):
     creationflags = 0
     if sys.platform == "win32":
         creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
-    return subprocess.Popen(parts, creationflags=creationflags, **kwargs)
+    return safe_command.run(subprocess.Popen, parts, creationflags=creationflags, **kwargs)
 
 
 def interrupt_ipc_subprocess(proc):
