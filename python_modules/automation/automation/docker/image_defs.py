@@ -8,6 +8,7 @@ from automation.git import git_repo_root
 from dagster import check
 
 from .dagster_docker import DagsterDockerImage
+from security import safe_command
 
 
 def get_dagster_repo():
@@ -64,7 +65,7 @@ def buildkite_integration_cm(cwd):
         ]
         print("Syncing scala_modules to build dir...")
         print(cmd)
-        subprocess.call(cmd, cwd=cwd)
+        safe_command.run(subprocess.call, cmd, cwd=cwd)
         yield
 
     finally:
