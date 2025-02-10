@@ -18,6 +18,7 @@ import zipfile
 from dagster.core.execution.plan.external_step import PICKLED_EVENTS_FILE_NAME, run_step_from_ref
 from dagster.core.instance import DagsterInstance
 from dagster.serdes import serialize_value
+import fickling
 
 # This won't be set in Databricks but is needed to be non-None for the
 # Dagster step to run.
@@ -43,13 +44,13 @@ def main(
 
         # We can use regular local filesystem APIs to access DBFS inside the Databricks runtime.
         with open(setup_filepath, "rb") as handle:
-            databricks_config = pickle.load(handle)
+            databricks_config = fickling.load(handle)
 
         # sc and dbutils are globally defined in the Databricks runtime.
         databricks_config.setup(dbutils, sc)  # noqa pylint: disable=undefined-variable
 
         with open(step_run_ref_filepath, "rb") as handle:
-            step_run_ref = pickle.load(handle)
+            step_run_ref = fickling.load(handle)
         print("Running dagster job")  # noqa pylint: disable=print-call
         with DagsterInstance.ephemeral() as instance:
             events = list(run_step_from_ref(step_run_ref, instance))

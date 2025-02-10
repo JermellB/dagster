@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import pytest
 from dagster import (
@@ -19,6 +18,7 @@ from dagster.core.execution.plan.plan import ExecutionPlan
 from dagster.core.instance import DagsterInstance
 from dagster.core.system_config.objects import ResolvedRunConfig
 from dagster.core.test_utils import default_mode_def_for_test, instance_for_test
+import fickling
 
 
 def define_inty_pipeline(using_file_system=False):
@@ -84,7 +84,7 @@ def test_using_file_system_for_subplan():
         os.path.join(instance.storage_directory(), pipeline_run.run_id, "return_one", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 1
+        assert fickling.load(read_obj) == 1
 
     add_one_step_events = list(
         execute_plan(
@@ -100,7 +100,7 @@ def test_using_file_system_for_subplan():
         os.path.join(instance.storage_directory(), pipeline_run.run_id, "add_one", "result"),
         "rb",
     ) as read_obj:
-        assert pickle.load(read_obj) == 2
+        assert fickling.load(read_obj) == 2
 
 
 def test_using_file_system_for_subplan_multiprocessing():
@@ -137,7 +137,7 @@ def test_using_file_system_for_subplan_multiprocessing():
             os.path.join(instance.storage_directory(), pipeline_run.run_id, "return_one", "result"),
             "rb",
         ) as read_obj:
-            assert pickle.load(read_obj) == 1
+            assert fickling.load(read_obj) == 1
 
         add_one_step_events = list(
             execute_plan(
@@ -156,7 +156,7 @@ def test_using_file_system_for_subplan_multiprocessing():
             os.path.join(instance.storage_directory(), pipeline_run.run_id, "add_one", "result"),
             "rb",
         ) as read_obj:
-            assert pickle.load(read_obj) == 2
+            assert fickling.load(read_obj) == 2
 
 
 def test_execute_step_wrong_step_key():

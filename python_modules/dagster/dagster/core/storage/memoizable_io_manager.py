@@ -9,6 +9,7 @@ from dagster.core.execution.context.output import OutputContext
 from dagster.core.storage.io_manager import IOManager, io_manager
 from dagster.utils import PICKLE_PROTOCOL, mkdir_p
 from dagster.utils.backcompat import experimental
+import fickling
 
 
 class MemoizableIOManager(IOManager):
@@ -69,7 +70,7 @@ class VersionedPickledObjectFilesystemIOManager(MemoizableIOManager):
         context.log.debug(f"Loading file from: {filepath}")
 
         with open(filepath, self.read_mode) as read_obj:
-            return pickle.load(read_obj)
+            return fickling.load(read_obj)
 
     def has_output(self, context):
         """Returns true if data object exists with the associated version, False otherwise."""
