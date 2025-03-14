@@ -20,7 +20,7 @@ def generate_new_project(path: str):
     os.mkdir(normalized_path)
 
     loader = jinja2.FileSystemLoader(searchpath=NEW_PROJECT_PATH)
-    env = jinja2.Environment(loader=loader)
+    env = jinja2.Environment(loader=loader, autoescape=True)
 
     for root, dirs, files in os.walk(NEW_PROJECT_PATH):
         # For each subdirectory in the source template, create a subdirectory in the destination.
