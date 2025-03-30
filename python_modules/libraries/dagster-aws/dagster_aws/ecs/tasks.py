@@ -1,10 +1,9 @@
 import os
 import typing
 from dataclasses import dataclass
-
-import requests
 from dagster.utils import merge_dicts
 from dagster.utils.backoff import backoff
+from security import safe_requests
 
 
 @dataclass
@@ -96,10 +95,10 @@ def default_ecs_task_metadata(ec2, ecs):
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html
     """
     container_metadata_uri = os.environ.get("ECS_CONTAINER_METADATA_URI_V4")
-    name = requests.get(container_metadata_uri).json()["Name"]
+    name = safe_requests.get(container_metadata_uri).json()["Name"]
 
     task_metadata_uri = container_metadata_uri + "/task"
-    response = requests.get(task_metadata_uri).json()
+    response = safe_requests.get(task_metadata_uri).json()
     cluster = response.get("Cluster")
     task_arn = response.get("TaskARN")
 

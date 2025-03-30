@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import requests
 from dagster import file_relative_path
 from dagster.core.storage.pipeline_run import PipelineRunStatus
+from security import safe_requests
 
 IS_BUILDKITE = os.getenv("BUILDKITE") is not None
 
@@ -133,7 +134,7 @@ def test_deploy_docker():
                 raise Exception("Timed out waiting for dagit server to be available")
 
             try:
-                sanity_check = requests.get(
+                sanity_check = safe_requests.get(
                     "http://{dagit_host}:3000/dagit_info".format(dagit_host=dagit_host)
                 )
                 assert "dagit" in sanity_check.text
@@ -143,7 +144,7 @@ def test_deploy_docker():
 
             time.sleep(1)
 
-        res = requests.get(
+        res = safe_requests.get(
             "http://{dagit_host}:3000/graphql?query={query_string}".format(
                 dagit_host=dagit_host,
                 query_string=PIPELINES_OR_ERROR_QUERY,
@@ -240,7 +241,7 @@ def _wait_for_run_status(run_id, dagit_host, desired_status):
         if time.time() - start_time > 60:
             raise Exception(f"Timed out waiting for run to reach status {desired_status}")
 
-        run_res = requests.get(
+        run_res = safe_requests.get(
             "http://{dagit_host}:3000/graphql?query={query_string}&variables={variables}".format(
                 dagit_host=dagit_host,
                 query_string=RUN_QUERY,
