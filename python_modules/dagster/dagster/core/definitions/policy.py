@@ -1,10 +1,10 @@
 from enum import Enum
-from random import random
 from typing import NamedTuple, Optional
 
 from dagster import check
 from dagster.core.errors import DagsterInvalidDefinitionError
 from dagster.utils.backcompat import experimental_class_warning
+import secrets
 
 
 class Backoff(Enum):
@@ -100,9 +100,9 @@ class RetryPolicy(
             check.assert_never(backoff)
 
         if jitter is Jitter.FULL:
-            calc_delay = random() * calc_delay
+            calc_delay = secrets.SystemRandom().random() * calc_delay
         elif jitter is Jitter.PLUS_MINUS:
-            calc_delay = calc_delay + ((2 * (random() * base_delay)) - base_delay)
+            calc_delay = calc_delay + ((2 * (secrets.SystemRandom().random() * base_delay)) - base_delay)
         elif jitter is None:
             pass
         else:

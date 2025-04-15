@@ -2,7 +2,6 @@
 import datetime
 import math
 import os
-import random
 import time
 from collections import defaultdict
 from contextlib import contextmanager
@@ -35,6 +34,7 @@ from dagster.utils import merge_dicts, segfault
 from dagster.utils.yaml_utils import merge_yamls
 from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from dagster_gcp.gcs import gcs_pickle_io_manager, gcs_resource
+import secrets
 
 IS_BUILDKITE = bool(os.getenv("BUILDKITE"))
 
@@ -250,7 +250,7 @@ def define_long_running_pipeline_celery():
                 "task in progress [%d/100]%% complete" % math.floor(100.0 * float(i) / iterations)
             )
             time.sleep(2)
-        return random.randint(0, iterations)
+        return secrets.SystemRandom().randint(0, iterations)
 
     @solid
     def post_process(context, input_count):

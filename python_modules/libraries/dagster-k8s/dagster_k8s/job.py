@@ -1,7 +1,6 @@
 import hashlib
 import json
 import os
-import random
 import string
 from collections import namedtuple
 from typing import List
@@ -17,6 +16,7 @@ from dagster.serdes import whitelist_for_serdes
 from dagster.utils import frozentags, merge_dicts
 
 from .models import k8s_model_from_dict
+import secrets
 
 # To retry step job, users should raise RetryRequested() so that the dagster system is aware of the
 # retry. As an example, see retry_pipeline in dagster_test.test_project.test_pipelines.repo
@@ -646,7 +646,7 @@ def get_k8s_job_name(input_1, input_2=None):
     check.opt_str_param(input_2, "input_2")
     if not input_2:
         letters = string.ascii_lowercase
-        input_2 = "".join(random.choice(letters) for i in range(20))
+        input_2 = "".join(secrets.choice(letters) for i in range(20))
 
     # Creates 32-bit signed int, so could be negative
     name_hash = hashlib.md5((input_1 + input_2).encode("utf-8"))

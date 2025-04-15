@@ -1,5 +1,4 @@
 import io
-import random
 from collections import defaultdict
 from contextlib import contextmanager
 from unittest import mock
@@ -8,6 +7,7 @@ from dagster_azure.blob import FakeBlobServiceClient
 
 from .resources import ADLS2Resource
 from .utils import ResourceNotFoundError
+import secrets
 
 
 class FakeADLS2Resource(ADLS2Resource):
@@ -125,7 +125,7 @@ class FakeADLS2FileClient:
     @contextmanager
     def acquire_lease(self, lease_duration=-1):  # pylint: disable=unused-argument
         if self.lease is None:
-            self.lease = random.randint(0, 2 ** 9)
+            self.lease = secrets.SystemRandom().randint(0, 2 ** 9)
             try:
                 yield self.lease
             finally:

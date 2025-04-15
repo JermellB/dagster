@@ -1,4 +1,3 @@
-import random
 from collections import defaultdict
 
 from dagster import (
@@ -11,6 +10,7 @@ from dagster import (
     SolidDefinition,
     check,
 )
+import secrets
 
 
 def generate_solid(solid_id, num_inputs, num_outputs, num_cfg):
@@ -39,14 +39,14 @@ def generate_pipeline(name, size, connect_factor=1.0):
     check.invariant(size > 3, "Can not create pipelines with less than 3 nodes")
     check.float_param(connect_factor, "connect_factor")
 
-    random.seed(name)
+    secrets.SystemRandom().seed(name)
 
     # generate nodes
     solids = {}
     for i in range(size):
-        num_inputs = random.randint(1, 3)
-        num_outputs = random.randint(1, 3)
-        num_cfg = random.randint(0, 5)
+        num_inputs = secrets.SystemRandom().randint(1, 3)
+        num_outputs = secrets.SystemRandom().randint(1, 3)
+        num_cfg = secrets.SystemRandom().randint(0, 5)
         solid_id = "{}_solid_{}".format(name, i)
         solids[solid_id] = generate_solid(
             solid_id=solid_id,
@@ -60,18 +60,18 @@ def generate_pipeline(name, size, connect_factor=1.0):
     deps = defaultdict(dict)
     for i in range(int(size * connect_factor)):
         # choose output
-        out_idx = random.randint(0, len(solid_ids) - 2)
+        out_idx = secrets.SystemRandom().randint(0, len(solid_ids) - 2)
         out_solid_id = solid_ids[out_idx]
         output_solid = solids[out_solid_id]
         output_name = output_solid.output_defs[
-            random.randint(0, len(output_solid.output_defs) - 1)
+            secrets.SystemRandom().randint(0, len(output_solid.output_defs) - 1)
         ].name
 
         # choose input
-        in_idx = random.randint(out_idx + 1, len(solid_ids) - 1)
+        in_idx = secrets.SystemRandom().randint(out_idx + 1, len(solid_ids) - 1)
         in_solid_id = solid_ids[in_idx]
         input_solid = solids[in_solid_id]
-        input_name = input_solid.input_defs[random.randint(0, len(input_solid.input_defs) - 1)].name
+        input_name = input_solid.input_defs[secrets.SystemRandom().randint(0, len(input_solid.input_defs) - 1)].name
 
         # map
         deps[in_solid_id][input_name] = DependencyDefinition(out_solid_id, output_name)

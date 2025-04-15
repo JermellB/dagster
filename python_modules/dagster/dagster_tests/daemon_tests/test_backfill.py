@@ -1,5 +1,4 @@
 import os
-import random
 import string
 import sys
 import time
@@ -37,6 +36,7 @@ from dagster.daemon.backfill import execute_backfill_iteration
 from dagster.seven import IS_WINDOWS, get_system_temp_directory
 from dagster.utils import touch_file
 from dagster.utils.error import SerializableErrorInfo
+import secrets
 
 default_mode_def = ModeDefinition(resource_defs={"io_manager": fs_io_manager})
 
@@ -155,7 +155,7 @@ def _large_partition_config(_):
     REQUEST_CONFIG_COUNT = 50000
 
     def _random_string(length):
-        return "".join(random.choice(string.ascii_lowercase) for x in range(length))
+        return "".join(secrets.choice(string.ascii_lowercase) for x in range(length))
 
     return {
         "solids": {

@@ -1,10 +1,10 @@
 import math
 import time
 from datetime import datetime
-from random import random
 
 from dagster import AssetMaterialization, In, Nothing, Out, fs_io_manager, graph, op
 from dagster.utils.partitions import DEFAULT_DATE_FORMAT
+import secrets
 
 TRAFFIC_CONSTANTS = {
     0: 1,
@@ -71,7 +71,7 @@ def make_op(
 
             time.sleep(sleep_time)
 
-        rand = random()
+        rand = secrets.SystemRandom().random()
         if error_rate and rand < error_rate:
             raise IntentionalRandomFailure(f"random {rand} < error rate {error_rate}")
 
