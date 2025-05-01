@@ -19,6 +19,7 @@ from dagster.core.execution.context_creation_pipeline import PlanExecutionContex
 from dagster.core.execution.plan.execute_step import core_dagster_event_sequence_for_step
 from dagster.core.instance import DagsterInstance
 from dagster.core.storage.file_manager import LocalFileHandle, LocalFileManager
+from security import safe_command
 
 PICKLED_EVENTS_FILE_NAME = "events.pkl"
 PICKLED_STEP_RUN_REF_FILE_NAME = "step_run_ref.pkl"
@@ -70,7 +71,7 @@ class LocalExternalStepLauncher(StepLauncher):
         # while waiting for the subprocess to complete, so that we can terminate slow or
         # hanging steps
         with raise_execution_interrupts():
-            subprocess.call(command_tokens, stdout=sys.stdout, stderr=sys.stderr)
+            safe_command.run(subprocess.call, command_tokens, stdout=sys.stdout, stderr=sys.stderr)
 
         events_file_path = os.path.join(step_run_dir, PICKLED_EVENTS_FILE_NAME)
         file_manager = LocalFileManager(".")

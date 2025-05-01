@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import requests
 from dagster import file_relative_path
 from dagster.core.storage.pipeline_run import PipelineRunStatus
+from security import safe_command
 
 IS_BUILDKITE = os.getenv("BUILDKITE") is not None
 
@@ -23,7 +24,7 @@ def docker_service_up(docker_compose_file):
     except subprocess.CalledProcessError:
         pass
 
-    build_process = subprocess.Popen([file_relative_path(docker_compose_file, "./build.sh")])
+    build_process = safe_command.run(subprocess.Popen, [file_relative_path(docker_compose_file, "./build.sh")])
     build_process.wait()
     assert build_process.returncode == 0
 
