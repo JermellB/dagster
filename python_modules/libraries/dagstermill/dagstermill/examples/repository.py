@@ -24,6 +24,7 @@ from dagster import (
 from dagster.core.storage.file_manager import local_file_manager
 from dagster.utils import PICKLE_PROTOCOL, file_relative_path
 from dagstermill.io_managers import local_output_notebook_io_manager
+import fickling
 
 try:
     from dagster_pandas import DataFrame
@@ -356,7 +357,7 @@ class FilePickleList:
 
     def read(self):
         with open(self.path, "rb") as fd:
-            self.list = pickle.load(fd)
+            self.list = fickling.load(fd)
             return self.list
 
     def write(self):

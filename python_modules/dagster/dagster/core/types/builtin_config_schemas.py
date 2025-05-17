@@ -17,6 +17,7 @@ from dagster.config.field_utils import Selector
 from dagster.utils.backcompat import ExperimentalWarning
 
 from .config_schema import dagster_type_loader, dagster_type_materializer
+import fickling
 
 
 def define_typed_input_schema_dict(value_config_type):
@@ -40,7 +41,7 @@ def load_type_input_schema_dict(value):
             return value_dict["value"]
     elif file_type == "pickle":
         with open(file_options["path"], "rb") as ff:
-            return pickle.load(ff)
+            return fickling.load(ff)
     else:
         check.failed("Unsupported key {key}".format(key=file_type))
 

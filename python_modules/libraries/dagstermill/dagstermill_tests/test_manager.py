@@ -1,6 +1,5 @@
 import contextlib
 import os
-import pickle
 import shutil
 import tempfile
 import threading
@@ -17,6 +16,7 @@ from dagster.serdes import pack_value
 from dagster.utils import safe_tempfile_path
 from dagstermill import DagstermillError
 from dagstermill.manager import Manager
+import fickling
 
 
 @contextlib.contextmanager
@@ -219,7 +219,7 @@ def test_in_pipeline_manager_with_resources():
             assert "list" in manager.context.resources._asdict()
 
             with open(path, "rb") as fd:
-                messages = pickle.load(fd)
+                messages = fickling.load(fd)
 
             messages = [message.split(": ") for message in messages]
 
@@ -229,7 +229,7 @@ def test_in_pipeline_manager_with_resources():
             manager.teardown_resources()
 
             with open(path, "rb") as fd:
-                messages = pickle.load(fd)
+                messages = fickling.load(fd)
 
             messages = [message.split(": ") for message in messages]
 
