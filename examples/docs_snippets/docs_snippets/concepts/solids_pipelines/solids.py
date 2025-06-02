@@ -31,7 +31,7 @@ def my_op():
 @op(config_schema={"api_endpoint": str})
 def my_configurable_op(context):
     api_endpoint = context.op_config["api_endpoint"]
-    data = requests.get(f"{api_endpoint}/data").json()
+    data = requests.get(f"{api_endpoint}/data", timeout=60).json()
     return data
 
 

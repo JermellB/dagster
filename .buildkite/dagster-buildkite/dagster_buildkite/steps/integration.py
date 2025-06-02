@@ -173,7 +173,7 @@ def build_steps_integration_suite(
 
 
 def _get_latest_dagster_release():
-    res = requests.get("https://pypi.org/pypi/dagster/json")
+    res = requests.get("https://pypi.org/pypi/dagster/json", timeout=60)
     module_json = res.json()
     releases = module_json["releases"]
     release_versions = [packaging.version.parse(release) for release in releases.keys()]

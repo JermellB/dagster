@@ -15,7 +15,7 @@ def download_file(context) -> str:
     target_path = context.solid_config["target_path"]
 
     with open(target_path, "w") as fd:
-        fd.write(requests.get(url).text)
+        fd.write(requests.get(url, timeout=60).text)
 
     return target_path
 

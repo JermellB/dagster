@@ -19,7 +19,7 @@ SimpleDataFrame = DagsterType(
 # start_custom_types_2_marker_1
 @op(out=Out(SimpleDataFrame))
 def bad_download_csv(context):
-    response = requests.get("https://docs.dagster.io/assets/cereal.csv")
+    response = requests.get("https://docs.dagster.io/assets/cereal.csv", timeout=60)
     lines = response.text.split("\n")
     context.log.info("Read {n_lines} lines".format(n_lines=len(lines)))
     return ["not_a_dict"]

@@ -242,7 +242,7 @@ class ConfigParser:
 def main():
     api_url = "https://www.googleapis.com/discovery/v1/apis/dataproc/v1/rest"
     base_path = "../libraries/dagster-gcp/dagster_gcp/dataproc/"
-    json_schema = requests.get(api_url).json().get("schemas")
+    json_schema = requests.get(api_url, timeout=60).json().get("schemas")
 
     c = ConfigParser(json_schema)
     parsed = c.extract_schema_for_object("Job", "dataproc_job")

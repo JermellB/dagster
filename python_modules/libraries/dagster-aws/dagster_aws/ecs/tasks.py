@@ -96,10 +96,10 @@ def default_ecs_task_metadata(ec2, ecs):
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html
     """
     container_metadata_uri = os.environ.get("ECS_CONTAINER_METADATA_URI_V4")
-    name = requests.get(container_metadata_uri).json()["Name"]
+    name = requests.get(container_metadata_uri, timeout=60).json()["Name"]
 
     task_metadata_uri = container_metadata_uri + "/task"
-    response = requests.get(task_metadata_uri).json()
+    response = requests.get(task_metadata_uri, timeout=60).json()
     cluster = response.get("Cluster")
     task_arn = response.get("TaskARN")
 

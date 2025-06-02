@@ -84,7 +84,7 @@ class DbtRpcClient(DbtResource):
         """
         headers = self._construct_headers()
         try:
-            response = requests.post(self.url, headers=headers, data=data)
+            response = requests.post(self.url, headers=headers, data=data, timeout=60)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             if is_fatal_code(e):

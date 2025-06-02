@@ -44,7 +44,7 @@ def assert_run_success(client, run_id: int):
 
 @pytest.fixture(name="dagster_most_recent_release", scope="session")
 def dagster_most_recent_release():
-    res = requests.get("https://pypi.org/pypi/dagster/json")
+    res = requests.get("https://pypi.org/pypi/dagster/json", timeout=60)
     module_json = res.json()
     releases = module_json["releases"]
     release_versions = [packaging.version.parse(release) for release in releases.keys()]
