@@ -1,7 +1,7 @@
-import random
 import time
 
 from dagster import Field, In, Out, Output, graph, op
+import secrets
 
 
 @op(
@@ -21,9 +21,9 @@ def hammer_op(context, chase_duration):
     ptr_length = context.op_config["chase_size"]
 
     data = list(range(0, ptr_length))
-    random.shuffle(data)
+    secrets.SystemRandom().shuffle(data)
 
-    curr = random.randint(0, ptr_length - 1)
+    curr = secrets.SystemRandom().randint(0, ptr_length - 1)
     # and away we go
     start_time = time.time()
     while (time.time() - start_time) < chase_duration:

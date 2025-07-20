@@ -1,6 +1,6 @@
 import os
-import random
 import subprocess
+import secrets
 
 IS_BUILDKITE = os.getenv("BUILDKITE") is not None
 
@@ -33,7 +33,7 @@ def which_(exe):
 
 
 def get_test_namespace():
-    namespace_suffix = hex(random.randint(0, 16 ** 6))[2:]
+    namespace_suffix = hex(secrets.SystemRandom().randint(0, 16 ** 6))[2:]
     return "dagster-test-%s" % namespace_suffix
 
 

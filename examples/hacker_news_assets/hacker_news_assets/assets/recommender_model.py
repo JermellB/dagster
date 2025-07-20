@@ -1,11 +1,11 @@
 # pylint: disable=redefined-outer-name
-import random
 
 from dagster import EventMetadata, Output
 from dagster.core.asset_defs import AssetIn, asset
 from hacker_news_assets.assets.user_story_matrix import IndexedCooMatrix
 from pandas import DataFrame, Series
 from sklearn.decomposition import TruncatedSVD
+import secrets
 
 
 @asset
@@ -13,7 +13,7 @@ def recommender_model(user_story_matrix: IndexedCooMatrix):
     """
     An SVD model for collaborative filtering-based recommendation.
     """
-    n_components = random.randint(90, 110)
+    n_components = secrets.SystemRandom().randint(90, 110)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(user_story_matrix.matrix)
 

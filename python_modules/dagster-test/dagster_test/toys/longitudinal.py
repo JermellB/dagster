@@ -1,7 +1,6 @@
 import math
 import time
 from datetime import datetime
-from random import random
 
 from dagster import (
     AssetMaterialization,
@@ -14,6 +13,7 @@ from dagster import (
     solid,
 )
 from dagster.utils.partitions import DEFAULT_DATE_FORMAT
+import secrets
 
 TRAFFIC_CONSTANTS = {
     0: 1,
@@ -80,7 +80,7 @@ def make_solid(
 
             time.sleep(sleep_time)
 
-        rand = random()
+        rand = secrets.SystemRandom().random()
         if error_rate and rand < error_rate:
             raise IntentionalRandomFailure(f"random {rand} < error rate {error_rate}")
 

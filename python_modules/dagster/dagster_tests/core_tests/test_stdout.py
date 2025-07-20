@@ -1,5 +1,4 @@
 import os
-import random
 import string
 import sys
 import tempfile
@@ -23,6 +22,7 @@ from dagster.core.storage.compute_log_manager import ComputeIOType
 from dagster.core.test_utils import create_run_for_test, instance_for_test
 from dagster.seven import multiprocessing
 from dagster.utils import ensure_dir, touch_file
+import secrets
 
 HELLO_SOLID = "HELLO SOLID"
 HELLO_RESOURCE = "HELLO RESOURCE"
@@ -208,7 +208,7 @@ def test_compute_log_manager_subscription_updates():
 
 
 def gen_solid_name(length):
-    return "".join(random.choice(string.ascii_lowercase) for x in range(length))
+    return "".join(secrets.choice(string.ascii_lowercase) for x in range(length))
 
 
 @pytest.mark.skipif(

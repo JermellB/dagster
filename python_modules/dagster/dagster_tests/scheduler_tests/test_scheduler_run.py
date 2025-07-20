@@ -1,6 +1,5 @@
 import datetime
 import os
-import random
 import string
 import sys
 import time
@@ -44,6 +43,7 @@ from dagster.scheduler.scheduler import launch_scheduled_runs
 from dagster.seven.compat.pendulum import create_pendulum_time, to_timezone
 from dagster.utils import merge_dicts
 from dagster.utils.partitions import DEFAULT_DATE_FORMAT
+import secrets
 
 _COUPLE_DAYS_AGO = datetime.datetime(year=2019, month=2, day=25)
 
@@ -286,7 +286,7 @@ def large_schedule(_):
     REQUEST_CONFIG_COUNT = 120000
 
     def _random_string(length):
-        return "".join(random.choice(string.ascii_lowercase) for x in range(length))
+        return "".join(secrets.choice(string.ascii_lowercase) for x in range(length))
 
     return {
         "solids": {

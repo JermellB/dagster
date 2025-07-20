@@ -3,7 +3,6 @@ Unit testing the Mlflow class
 """
 # pylint: disable=redefined-outer-name
 import logging
-import random
 import string
 import uuid
 from copy import deepcopy
@@ -15,13 +14,14 @@ import pandas as pd
 import pytest
 from dagster import ModeDefinition, execute_pipeline, pipeline, solid
 from dagster_mlflow.resources import MlFlow, mlflow_tracking
+import secrets
 
 
 @pytest.fixture
 def string_maker():
     class Dummy:
         def __call__(self, size=5):
-            return "".join(random.choice(string.ascii_letters) for _ in range(size))
+            return "".join(secrets.choice(string.ascii_letters) for _ in range(size))
 
     return Dummy()
 

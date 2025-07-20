@@ -1,4 +1,3 @@
-import random
 import string
 import uuid
 import warnings
@@ -8,6 +7,7 @@ import toposort as toposort_
 from dagster import check
 from dagster.utils import frozendict
 from dagster.version import __version__
+import secrets
 
 BACKFILL_TAG_LENGTH = 8
 
@@ -59,7 +59,7 @@ def make_new_run_id():
 
 
 def make_new_backfill_id():
-    return "".join(random.choice(string.ascii_lowercase) for x in range(BACKFILL_TAG_LENGTH))
+    return "".join(secrets.choice(string.ascii_lowercase) for x in range(BACKFILL_TAG_LENGTH))
 
 
 def str_format_list(items):
