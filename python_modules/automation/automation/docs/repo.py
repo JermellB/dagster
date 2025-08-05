@@ -7,6 +7,7 @@ import sys
 
 from automation.git import git_commit_updates, git_repo_root
 from dagster.utils import mkdir_p
+from security import safe_command
 
 
 class DagsterRepo:
@@ -29,7 +30,7 @@ class DagsterRepo:
         """Run docs build"""
         cmd = "NODE_ENV=production VERSION={} make full_docs_build".format(docs_version)
         print("Running build:\n", cmd)
-        subprocess.call(cmd, cwd=self.docs_path, shell=True)
+        safe_command.run(subprocess.call, cmd, cwd=self.docs_path, shell=True)
 
     def commit(self, docs_version):
         git_commit_updates(self.base_dir, message="[Docs] {}".format(docs_version))
@@ -45,7 +46,7 @@ class DagsterDocsRepo:
         if not os.path.exists(docs_dir) and should_clone:
             print("Cloning docs repo...")
             cmd = "git clone git@github.com:dagster-io/dagster-docs.git {}".format(docs_dir)
-            subprocess.call(cmd, shell=True)
+            safe_command.run(subprocess.call, cmd, shell=True)
 
     def check_new_version_dir(self, docs_version):
         """Checks dagster-docs/x.x.x version folder and ensure it doesn't already exist"""

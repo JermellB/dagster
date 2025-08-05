@@ -12,6 +12,7 @@ from dagster.core.execution import poll_compute_logs, watch_orphans
 from dagster.serdes.ipc import interrupt_ipc_subprocess, open_ipc_subprocess
 from dagster.seven import IS_WINDOWS, wait_for_process
 from dagster.utils import ensure_file
+from security import safe_command
 
 WIN_PY36_COMPUTE_LOG_DISABLED_MSG = """\u001b[33mWARNING: Compute log capture is disabled for the current environment. Set the environment variable `PYTHONLEGACYWINDOWSSTDIO` to enable.\n\u001b[0m"""
 
@@ -119,13 +120,12 @@ def execute_posix_tail(path, stream):
     try:
         tail_process = None
         watcher_process = None
-        tail_process = subprocess.Popen(tail_cmd, stdout=stream)
+        tail_process = safe_command.run(subprocess.Popen, tail_cmd, stdout=stream)
 
         # open a watcher process to check for the orphaning of the tail process (e.g. when the
         # current process is suddenly killed)
         watcher_file = os.path.abspath(watch_orphans.__file__)
-        watcher_process = subprocess.Popen(
-            [
+        watcher_process = safe_command.run(subprocess.Popen, [
                 sys.executable,
                 watcher_file,
                 str(os.getpid()),

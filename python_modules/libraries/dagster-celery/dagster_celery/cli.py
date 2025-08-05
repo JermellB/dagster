@@ -13,6 +13,7 @@ from dagster.utils import load_yaml_from_path, mkdir_p
 
 from .executor import CeleryExecutor, celery_executor
 from .make_app import make_app
+from security import safe_command
 
 
 def create_worker_cli_group():
@@ -92,8 +93,7 @@ def get_config_dir(config_yaml=None):
 
 
 def launch_background_worker(subprocess_args, env):
-    return subprocess.Popen(
-        subprocess_args + ["--detach", "--pidfile="], stdout=None, stderr=None, env=env
+    return safe_command.run(subprocess.Popen, subprocess_args + ["--detach", "--pidfile="], stdout=None, stderr=None, env=env
     )
 
 
