@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from security import safe_command
 
 
 def is_39():
@@ -27,7 +28,7 @@ def main(quiet):
     if quiet:
         cmd.append(quiet)
 
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = safe_command.run(subprocess.Popen, cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(" ".join(cmd))  # pylint: disable=print-call
     while True:
         output = p.stdout.readline()
@@ -106,8 +107,7 @@ def main(quiet):
     if quiet:
         cmd.append(quiet)
 
-    p = subprocess.Popen(
-        " ".join(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+    p = safe_command.run(subprocess.Popen, " ".join(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     )
     print(" ".join(cmd))  # pylint: disable=print-call
     while True:

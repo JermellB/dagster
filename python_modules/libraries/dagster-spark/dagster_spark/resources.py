@@ -6,6 +6,7 @@ from dagster.core.log_manager import DagsterLogManager
 
 from .types import SparkOpError
 from .utils import construct_spark_shell_command
+from security import safe_command
 
 
 class SparkResource:
@@ -55,7 +56,7 @@ class SparkResource:
         )
         self.logger.info("Running spark-submit: " + " ".join(spark_shell_cmd))
 
-        retcode = subprocess.call(" ".join(spark_shell_cmd), shell=True)
+        retcode = safe_command.run(subprocess.call, " ".join(spark_shell_cmd), shell=True)
 
         if retcode != 0:
             raise SparkOpError("Spark job failed. Please consult your logs.")

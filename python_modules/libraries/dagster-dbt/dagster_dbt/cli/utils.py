@@ -12,6 +12,7 @@ from ..errors import (
 )
 from .constants import DBT_RUN_RESULTS_COMMANDS, DEFAULT_DBT_TARGET_PATH
 from .types import DbtCliOutput
+from security import safe_command
 
 
 def execute_cli(
@@ -63,7 +64,7 @@ def execute_cli(
     logs = []
     output = []
 
-    process = subprocess.Popen(command_list, stdout=subprocess.PIPE)
+    process = safe_command.run(subprocess.Popen, command_list, stdout=subprocess.PIPE)
     for raw_line in process.stdout or []:
         line = raw_line.decode("utf-8")
         output.append(line)
